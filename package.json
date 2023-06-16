@@ -11,7 +11,12 @@
     "handlebars": "^4.7.7",
     "@fastify/formbody": "^7.4.0",
     "@fastify/static": "^6.10.1",
-    "@fastify/view": "^7.4.1"
+    "@fastify/view": "^7.4.1",
+    "express": "^4.17.1",
+    "axios": "^0.24.0",
+    "body-parser": "^1.19.0",
+    "dotenv": "^10.0.0",
+    "node-telegram-bot-api": "^0.53.0"
   },
   "engines": {
     "node": "14.x"
