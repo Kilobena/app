@@ -11,11 +11,11 @@ app.use(bodyParser.json());
 
 const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN);
 
-app.post('/', (req, res) => {
+app.post('/api/sendmessage', (req, res) => {
   const message = req.body.message;
 
   // Send the message to Telegram
-  bot.sendMessage('-849480822', message)
+  bot.sendMessage(process.env.TELEGRAM_CHAT_ID, message)
     .then(() => {
       res.sendStatus(200);
     })
