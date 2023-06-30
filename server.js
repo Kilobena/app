@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const axios = require('axios');
 const TelegramBot = require('node-telegram-bot-api');
 const firebase = require('firebase/app');
+require('firebase/firestore');
 require('dotenv').config();
 
 const app = express();
