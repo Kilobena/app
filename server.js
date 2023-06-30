@@ -2,8 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
 const TelegramBot = require('node-telegram-bot-api');
-const firebase = require('firebase/app');
-require('firebase/firestore');
+const initializeApp = require('firebase/app');
+const getFirestore = require('firebase/firestore');
 require('dotenv').config();
 
 const app = express();
@@ -12,18 +12,14 @@ const port = process.env.PORT || 3000;
 const firebaseConfig = {
   apiKey: 'AIzaSyAUDPSc0GjCkjCYZY3JzPLeHQv7x4JohBM',
   authDomain: 'alpha-beta-c59bf.firebaseapp.com',
-  databaseURL: 'YOUR_DATABASE_URL',
-  projectId: 'YOUR_PROJECT_ID',
-  storageBucket: 'YOUR_STORAGE_BUCKET',
-  messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
-  appId: 'YOUR_APP_ID'
+  projectId: 'alpha-beta-c59bf',
+  storageBucket: 'alpha-beta-c59bf.appspot.com',
+  messagingSenderId: '391199010242',
+  appId: '1:391199010242:web:bba372fccc230d6fb6ba5b'
 };
 
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-
-// Initialize Firestore
-const db = firebase.firestore();
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore(firebaseApp);
 
 app.use(bodyParser.json());
 

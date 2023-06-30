@@ -17,7 +17,8 @@
     "fastify": "^4.17.0",
     "firebase": "^9.23.0",
     "handlebars": "^4.7.7",
-    "node-telegram-bot-api": "^0.53.0"
+    "node-telegram-bot-api": "^0.53.0",
+    "@firebase/firestore": "^3.13.0"
   },
   "engines": {
     "node": "14.x"
