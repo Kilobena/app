@@ -74,7 +74,22 @@ app.post('/update-user/:documentId', async (req, res) => {
   }
 });
 
-app.post('/create')
+app.post('/validate-document/:id', async (req, res) => {
+  try{
+    const { documentId } = req.params;
+    
+    const docRef = doc(db, 'users', documentId);
+    const docSnapshot = await getDoc(docRef);
+    
+     if (docSnapshot.exists()) {
+      // Document exists, return the same ID
+      return docId;
+    }
+    
+  }catch(error){
+    
+  }
+})
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
