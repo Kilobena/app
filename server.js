@@ -3,7 +3,7 @@ import bodyParser from 'body-parser';
 import axios  from 'axios';
 import TelegramBot from 'node-telegram-bot-api';
 import {initializeApp}  from 'firebase/app';
-import {getFirestore} from 'firebase/firestore';
+import {getFirestore, getDoc, doc, updateDoc} from 'firebase/firestore';
 import { config } from 'dotenv';
 
 const app = express();
@@ -56,16 +56,20 @@ app.post('/api/updatefirebase', (req, res) => {
 
 
 // Endpoint to update a Firestore document
-app.post('/update-document/:documentId', async (req, res) => {
+app.get('/update-document/:documentId', async (req, res) => {
   try {
     console.log("Request recieved", req.params);
-//     const { documentId } = req.params;
+    const { documentId } = req.params;
+    const docRef = doc(db,"users", documentId)
+    const  docData = await getDoc(docRef);
+    
 //     const data = req.body;
 
 //     // Update the document with the provided ID
 //     await db.collection('users').doc(documentId).update(data);
 
-    res.send('Document updated successfully.');
+    res.send(docData.data());
+    // res.send('Document updated successfully.');
   } catch (error) {
     console.error('Error updating document:', error);
     res.status(500).send('An error occurred while updating the document.');
