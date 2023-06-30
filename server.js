@@ -74,7 +74,7 @@ app.post('/update-user/:documentId', async (req, res) => {
   }
 });
 
-
+app.post('/create')
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
