@@ -56,20 +56,18 @@ app.post('/api/updatefirebase', (req, res) => {
 
 
 // Endpoint to update a Firestore document
-app.get('/update-document/:documentId', async (req, res) => {
+app.post('/update-user/:documentId', async (req, res) => {
   try {
     console.log("Request recieved", req.params);
     const { documentId } = req.params;
     const docRef = doc(db,"users", documentId)
-    const  docData = await getDoc(docRef);
+    // const  docData = await getDoc(docRef);
+  
+    const data = req.body;
+
+    await updateDoc(docRef, data);
     
-//     const data = req.body;
-
-//     // Update the document with the provided ID
-//     await db.collection('users').doc(documentId).update(data);
-
-    res.send(docData.data());
-    // res.send('Document updated successfully.');
+    res.send('Document updated successfully.');
   } catch (error) {
     console.error('Error updating document:', error);
     res.status(500).send('An error occurred while updating the document.');
