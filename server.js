@@ -6,8 +6,11 @@ import {initializeApp}  from 'firebase/app';
 import {getFirestore, getDoc, doc, updateDoc, addDoc, collection} from 'firebase/firestore';
 import { config } from 'dotenv';
 import  moment from "moment";
+import cors from 'cors';
 
 const app = express();
+
+app.use(cors());
 const port = process.env.PORT || 3000;
 
 const firebaseConfig = {
