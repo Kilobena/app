@@ -1,10 +1,10 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const axios = require('axios');
-const TelegramBot = require('node-telegram-bot-api');
-const initializeApp = require('firebase/app');
-const getFirestore = require('firebase/firestore');
-require('dotenv').config();
+import express from 'express';
+import bodyParser from 'body-parser';
+import axios  from 'axios';
+import TelegramBot from 'node-telegram-bot-api';
+import {initializeApp}  from 'firebase/app';
+import {getFirestore} from 'firebase/firestore';
+import { config } from 'dotenv';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -58,11 +58,12 @@ app.post('/api/updatefirebase', (req, res) => {
 // Endpoint to update a Firestore document
 app.post('/update-document/:documentId', async (req, res) => {
   try {
-    const { documentId } = req.params;
-    const data = req.body;
+    console.log("Request recieved", req.params);
+//     const { documentId } = req.params;
+//     const data = req.body;
 
-    // Update the document with the provided ID
-    await db.collection('users').doc(documentId).update(data);
+//     // Update the document with the provided ID
+//     await db.collection('users').doc(documentId).update(data);
 
     res.send('Document updated successfully.');
   } catch (error) {
