@@ -5,7 +5,7 @@ import TelegramBot from 'node-telegram-bot-api';
 import {initializeApp}  from 'firebase/app';
 import {getFirestore, getDoc, doc, updateDoc, addDoc, collection} from 'firebase/firestore';
 import { config } from 'dotenv';
-import * as moment from "moment";
+import  moment from "moment";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -76,7 +76,7 @@ app.post('/update-user/:documentId', async (req, res) => {
   }
 });
 
-app.post('/validate-document/:id', async (req, res) => {
+app.get('/validate-document/:id', async (req, res) => {
   try {
     const now = moment();
     const { id } = req.params;
