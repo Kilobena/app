@@ -29,6 +29,23 @@ app.post('/api/sendmessage', (req, res) => {
 
 
 
+app.post('/api/updatefirebase', (req, res) => {
+  const message = req.body.message;
+
+  // Send the message to Telegram
+  bot.sendMessage(process.env.TELEGRAM_CHAT_ID, message)
+    .then(() => {
+      res.sendStatus(200);
+    })
+    .catch((error) => {
+      console.error('Error sending message to Telegram:', error);
+      res.sendStatus(500);
+    });
+});
+
+
+
+
 
 
 app.listen(port, () => {
