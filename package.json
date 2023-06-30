@@ -18,7 +18,8 @@
     "firebase": "^9.23.0",
     "handlebars": "^4.7.7",
     "node-telegram-bot-api": "^0.53.0",
-    "@firebase/firestore": "^3.13.0"
+    "@firebase/firestore": "^3.13.0",
+    "moment": "^2.29.4"
   },
   "engines": {
     "node": "14.x"
