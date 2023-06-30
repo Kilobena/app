@@ -9,6 +9,22 @@ require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 3000;
 
+const firebaseConfig = {
+  apiKey: 'AIzaSyAUDPSc0GjCkjCYZY3JzPLeHQv7x4JohBM',
+  authDomain: 'alpha-beta-c59bf.firebaseapp.com',
+  databaseURL: 'YOUR_DATABASE_URL',
+  projectId: 'YOUR_PROJECT_ID',
+  storageBucket: 'YOUR_STORAGE_BUCKET',
+  messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
+  appId: 'YOUR_APP_ID'
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+
+// Initialize Firestore
+const db = firebase.firestore();
+
 app.use(bodyParser.json());
 
 const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN);
@@ -28,9 +44,6 @@ app.post('/api/sendmessage', (req, res) => {
 });
 
 
-
-
-
 app.post('/api/updatefirebase', (req, res) => {
   const message = req.body.message;
 
@@ -46,7 +59,21 @@ app.post('/api/updatefirebase', (req, res) => {
 });
 
 
+// Endpoint to update a Firestore document
+app.post('/update-document/:documentId', async (req, res) => {
+  try {
+    const { documentId } = req.params;
+    const data = req.body;
 
+    // Update the document with the provided ID
+    await db.collection('users').doc(documentId).update(data);
+
+    res.send('Document updated successfully.');
+  } catch (error) {
+    console.error('Error updating document:', error);
+    res.status(500).send('An error occurred while updating the document.');
+  }
+});
 
 
 
