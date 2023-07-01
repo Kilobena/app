@@ -114,6 +114,18 @@ app.get("/validate-document/:id", async (req, res) => {
   }
 });
 
+app.get("/auth-admin/:password", async (req, res) => {
+  try{
+    const { password } = req.params;
+    const isAuthenticated = password === process.env.ADMIN_PASSWORD;
+    
+    res.json({isAuthenticated});
+  }catch(error){
+    console.log(error);
+    res.status(500).send("An error occurred while validating the document.");
+  }
+})
+
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
