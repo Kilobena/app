@@ -117,7 +117,7 @@ app.get("/auth-admin/:password", async (req, res) => {
 
 
 // API endpoint to get real-time user data
-app.get('/users', (req, res) => {
+app.get('/users-live-data', (req, res) => {
   const usersRef = db.collection('users');
 
   // Subscribe to real-time updates
