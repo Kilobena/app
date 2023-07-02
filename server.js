@@ -14,8 +14,10 @@ import {
 import { config } from "dotenv";
 import moment from "moment";
 import cors from "cors";
+import admin from "firebase-admin";
 
 const app = express();
+import serviceAccount from './firebase-service-account.json';
 
 app.use(cors());
 const port = process.env.PORT || 3000;
