@@ -147,25 +147,21 @@ app.get("/auth-user/:password", async (req, res) => {
   }
 });
 
-// Endpoint to update constants.json file
+// Endpoint to update constants
 app.post("/update-constants", (req, res) => {
   try {
     const { constants: updatedConstants } = req.body;
 
-    // Update the values of the specified constants
-    for (const key in updatedConstants) {
-      if (constants.hasOwnProperty(key)) {
-        constants[key] = updatedConstants[key];
-      }
-    }
+    // Merge the updated constants with the existing ones
+    const mergedConstants = { ...constants, ...updatedConstants };
 
-    // Write the updated constants.json file
+    // Write the merged constants to the constants.json file
     fs.writeFileSync(
       "./constants.json",
-      JSON.stringify(constants, null, 2)
+      JSON.stringify(mergedConstants, null, 2)
     );
 
-    res.send(constants);
+    res.json(mergedConstants);
   } catch (error) {
     console.error("Error updating constants:", error);
     res
