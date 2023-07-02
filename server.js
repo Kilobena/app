@@ -4,7 +4,7 @@ const axios = require("axios");
 const TelegramBot = require("node-telegram-bot-api");
 const admin = require("firebase-admin");
 const moment = require("moment");
-const cors = require("cors")({ origin: true });
+const cors = require("cors");
 
 const serviceAccount = require("./firebase-service-account.json");
 
@@ -15,7 +15,8 @@ admin.initializeApp({
 
 const app = express();
 
-// app.use(cors());
+
+app.use(cors());
 const port = process.env.PORT || 3000;
 
 const db = admin.firestore();
