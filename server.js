@@ -1,39 +1,24 @@
-import express from "express";
-import bodyParser from "body-parser";
-import axios from "axios";
-import TelegramBot from "node-telegram-bot-api";
-import { initializeApp } from "firebase/app";
-import {
-  getFirestore,
-  getDoc,
-  doc,
-  updateDoc,
-  addDoc,
-  collection,
-} from "firebase/firestore";
-import { config } from "dotenv";
-import moment from "moment";
-import cors from "cors";
-import admin from "firebase-admin";
+const express = require("express");
+const bodyParser = require("body-parser");
+const axios = require("axios");
+const TelegramBot = require("node-telegram-bot-api");
+const admin = require("firebase-admin");
+const moment = require("moment");
+const cors = require("cors");
+
+const serviceAccount = require('./firebase-service-account.json');
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://your-project-id.firebaseio.com",
+});
 
 const app = express();
-import serviceAccount from './firebase-service-account.json';
 
 app.use(cors());
 const port = process.env.PORT || 3000;
 
-const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY,
-  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-  databaseURL: process.env.FIREBASE_DATABASE_URL,
-  projectId: process.env.FIREBASE_PROJECT_ID,
-  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.FIREBASE_APP_ID,
-};
-
-const firebaseApp = initializeApp(firebaseConfig);
-const db = getFirestore(firebaseApp);
+const db = admin.firestore();
 
 app.use(bodyParser.json());
 
@@ -73,12 +58,11 @@ app.post("/api/updatefirebase", (req, res) => {
 app.post("/update-user/:documentId", async (req, res) => {
   try {
     const { documentId } = req.params;
-    const docRef = doc(db, "users", documentId);
-    // const  docData = await getDoc(docRef);
+    const docRef = db.collection("users").doc(documentId);
 
     const data = req.body;
 
-    await updateDoc(docRef, data);
+    await docRef.update(data);
 
     res.send("Document updated successfully.");
   } catch (error) {
@@ -92,16 +76,16 @@ app.get("/validate-document/:id", async (req, res) => {
     const now = moment();
     const { id } = req.params;
 
-    const docRef = doc(db, "users", id);
-    const docSnapshot = await getDoc(docRef);
+    const docRef = db.collection("users").doc(id);
+    const docSnapshot = await docRef.get();
 
     let documentId;
 
-    if (docSnapshot.exists()) {
+    if (docSnapshot.exists) {
       // Document exists, return the same ID
       documentId = id;
     } else {
-      const newDocRef = await addDoc(collection(db, "users"), {
+      const newDocRef = await db.collection("users").add({
         createdAt: now.format("YYYY-MM-DD,hh:mm:ss"),
         base64Img: "",
       });
@@ -120,13 +104,13 @@ app.get("/auth-admin/:password", async (req, res) => {
   try{
     const { password } = req.params;
     const isAuthenticated = password === process.env.ADMIN_PASSWORD;
-    
-    res.json({isAuthenticated});
+
+    res.json({ isAuthenticated });
   }catch(error){
     console.log(error);
     res.status(500).send("An error occurred while validating the document.");
   }
-})
+});
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
