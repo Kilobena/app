@@ -115,6 +115,20 @@ app.get("/auth-admin/:password", async (req, res) => {
   
 });
 
+app.get("/auth-user/:password", async (req, res) => {
+
+    try {
+      const { password } = req.params;
+      const isAuthenticated = password === process.env.USER_PASSWORD;
+
+      res.json({ isAuthenticated });
+    } catch (error) {
+      console.log(error);
+      res.status(500).send("An error occurred while validating the document.");
+    }
+  
+});
+
 
 // Endpoint to start the snapshot listener
 // app.get('/start-listener', (req, res) => {
