@@ -122,6 +122,7 @@ app.get('/users-live-data', (req, res) => {
 
   // Subscribe to real-time updates using a snapshot listener
   const unsubscribe = usersRef.onSnapshot(snapshot => {
+    console.log("Request come");
     const users = [];
     snapshot.forEach(doc => {
       users.push({ id: doc.id, ...doc.data() });
