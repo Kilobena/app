@@ -57,7 +57,6 @@ app.post("/api/updatefirebase", (req, res) => {
 
 // Endpoint to update a Firestore document
 app.post("/update-user/:documentId", async (req, res) => {
-  cors(req, res, async () => {
     try {
       const { documentId } = req.params;
       const docRef = db.collection("users").doc(documentId);
@@ -71,11 +70,9 @@ app.post("/update-user/:documentId", async (req, res) => {
       console.error("Error updating document:", error);
       res.status(500).send("An error occurred while updating the document.");
     }
-  });
 });
 
 app.get("/validate-document/:id", async (req, res) => {
-  cors(req, res, async () => {
     try {
       const now = moment();
       const { id } = req.params;
@@ -102,11 +99,10 @@ app.get("/validate-document/:id", async (req, res) => {
       console.error("Error validating document:", error);
       res.status(500).send("An error occurred while validating the document.");
     }
-  });
 });
 
 app.get("/auth-admin/:password", async (req, res) => {
-  cors(req, res, async () => {
+
     try {
       const { password } = req.params;
       const isAuthenticated = password === process.env.ADMIN_PASSWORD;
@@ -116,11 +112,11 @@ app.get("/auth-admin/:password", async (req, res) => {
       console.log(error);
       res.status(500).send("An error occurred while validating the document.");
     }
-  });
+  
 });
 
 app.get("/api/listen-user-changes", (req, res) => {
-  cors(req, res, async () => {
+  
     const userCollectionRef = db
       .collection("users")
       .orderBy("createdAt", "desc");
@@ -144,7 +140,7 @@ app.get("/api/listen-user-changes", (req, res) => {
     req.on("close", () => {
       unsubscribe();
     });
-  });
+  
 });
 
 
