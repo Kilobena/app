@@ -120,7 +120,7 @@ app.get("/auth-admin/:password", async (req, res) => {
 app.get('/users-live-data', (req, res) => {
   const usersRef = db.collection('users');
 
-  // Subscribe to real-time updates
+  // Subscribe to real-time updates using a snapshot listener
   const unsubscribe = usersRef.onSnapshot(snapshot => {
     const users = [];
     snapshot.forEach(doc => {
