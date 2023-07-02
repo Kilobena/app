@@ -127,9 +127,8 @@ app.get("/api/listen-user-changes", (req, res) => {
     // You can use a WebSocket or a socket.io library for real-time updates
 
     console.log("User data updated:", users);
+    res.json({users});
   });
-
-  res.send("Listening to user changes...");
 });
 
 app.listen(port, () => {
