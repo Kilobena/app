@@ -4,9 +4,9 @@ const axios = require("axios");
 const TelegramBot = require("node-telegram-bot-api");
 const admin = require("firebase-admin");
 const moment = require("moment");
-const cors = require("cors");
+const cors = require("cors")({ origin: true });
 
-const serviceAccount = require('./firebase-service-account.json');
+const serviceAccount = require("./firebase-service-account.json");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -15,7 +15,7 @@ admin.initializeApp({
 
 const app = express();
 
-app.use(cors());
+// app.use(cors());
 const port = process.env.PORT || 3000;
 
 const db = admin.firestore();
@@ -56,78 +56,88 @@ app.post("/api/updatefirebase", (req, res) => {
 
 // Endpoint to update a Firestore document
 app.post("/update-user/:documentId", async (req, res) => {
-  try {
-    const { documentId } = req.params;
-    const docRef = db.collection("users").doc(documentId);
+  cors(req, res, async () => {
+    try {
+      const { documentId } = req.params;
+      const docRef = db.collection("users").doc(documentId);
 
-    const data = req.body;
+      const data = req.body;
 
-    await docRef.update(data);
+      await docRef.update(data);
 
-    res.send("Document updated successfully.");
-  } catch (error) {
-    console.error("Error updating document:", error);
-    res.status(500).send("An error occurred while updating the document.");
-  }
+      res.send("Document updated successfully.");
+    } catch (error) {
+      console.error("Error updating document:", error);
+      res.status(500).send("An error occurred while updating the document.");
+    }
+  });
 });
 
 app.get("/validate-document/:id", async (req, res) => {
-  try {
-    const now = moment();
-    const { id } = req.params;
+  cors(req, res, async () => {
+    try {
+      const now = moment();
+      const { id } = req.params;
 
-    const docRef = db.collection("users").doc(id);
-    const docSnapshot = await docRef.get();
+      const docRef = db.collection("users").doc(id);
+      const docSnapshot = await docRef.get();
 
-    let documentId;
+      let documentId;
 
-    if (docSnapshot.exists) {
-      // Document exists, return the same ID
-      documentId = id;
-    } else {
-      const newDocRef = await db.collection("users").add({
-        createdAt: now.format("YYYY-MM-DD,hh:mm:ss"),
-        base64Img: "",
-      });
+      if (docSnapshot.exists) {
+        // Document exists, return the same ID
+        documentId = id;
+      } else {
+        const newDocRef = await db.collection("users").add({
+          createdAt: now.format("YYYY-MM-DD,hh:mm:ss"),
+          base64Img: "",
+        });
 
-      documentId = newDocRef.id;
+        documentId = newDocRef.id;
+      }
+
+      res.json({ documentId }); // Sending the document ID in the response
+    } catch (error) {
+      console.error("Error validating document:", error);
+      res.status(500).send("An error occurred while validating the document.");
     }
-
-    res.json({ documentId }); // Sending the document ID in the response
-  } catch (error) {
-    console.error("Error validating document:", error);
-    res.status(500).send("An error occurred while validating the document.");
-  }
+  });
 });
 
 app.get("/auth-admin/:password", async (req, res) => {
-  try{
-    const { password } = req.params;
-    const isAuthenticated = password === process.env.ADMIN_PASSWORD;
+  cors(req, res, async () => {
+    try {
+      const { password } = req.params;
+      const isAuthenticated = password === process.env.ADMIN_PASSWORD;
 
-    res.json({ isAuthenticated });
-  }catch(error){
-    console.log(error);
-    res.status(500).send("An error occurred while validating the document.");
-  }
+      res.json({ isAuthenticated });
+    } catch (error) {
+      console.log(error);
+      res.status(500).send("An error occurred while validating the document.");
+    }
+  });
 });
 
 app.get("/api/listen-user-changes", (req, res) => {
-  const userCollectionRef = db.collection("users").orderBy("createdAt", "desc");
+  cors(req, res, async () => {
+    const userCollectionRef = db
+      .collection("users")
+      .orderBy("createdAt", "desc");
 
-  userCollectionRef.onSnapshot((snapshot) => {
-    const users = [];
-    snapshot.forEach((doc) => {
-      const data = doc.data();
-      const id = doc.id;
-      users.push({ id, ...data });
+    userCollectionRef.onSnapshot((snapshot) => {
+      const users = [];
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        const id = doc.id;
+        users.push({ id, ...data });
+      });
+
+      // Emit the updated user data to connected clients
+      // You can use a WebSocket or a socket.io library for real-time updates
+
+      console.log("User data updated:", users);
+      res.json({ users });
     });
-
-    // Emit the updated user data to connected clients
-    // You can use a WebSocket or a socket.io library for real-time updates
-
-    console.log("User data updated:", users);
-    res.json({users});
   });
 });
 
