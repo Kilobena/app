@@ -117,24 +117,24 @@ app.get("/auth-admin/:password", async (req, res) => {
 
 
 // Endpoint to start the snapshot listener
-app.get('/start-listener', (req, res) => {
-  const collectionRef = db.collection('users');
+// app.get('/start-listener', (req, res) => {
+//   const collectionRef = db.collection('users');
 
-  // Create a snapshot listener
-  const unsubscribe = collectionRef.onSnapshot((snapshot) => {
-    console.log("Request recieved in snapshot");
-    const documents = [];
-    snapshot.forEach((doc) => {
-      documents.push(doc.data());
-    });
-    res.json(documents);
-  });
+//   // Create a snapshot listener
+//   const unsubscribe = collectionRef.onSnapshot((snapshot) => {
+//     console.log("Request recieved in snapshot");
+//     const documents = [];
+//     snapshot.forEach((doc) => {
+//       documents.push(doc.data());
+//     });
+//     res.json(documents);
+//   });
 
-  // Store the unsubscribe function for later use
-  req.on('close', () => {
-    unsubscribe();
-  });
-});
+//   // Store the unsubscribe function for later use
+//   req.on('close', () => {
+//     unsubscribe();
+//   });
+// });
 
 
 
