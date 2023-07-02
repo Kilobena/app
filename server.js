@@ -5,17 +5,17 @@ const TelegramBot = require("node-telegram-bot-api");
 const admin = require("firebase-admin");
 const moment = require("moment");
 const cors = require("cors");
-const fs = require('fs');
+const fs = require("fs");
+
+const constants = require("./constants.json");
 
 const serviceAccount = require("./firebase-service-account.json");
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://your-project-id.firebaseio.com",
+  credential: admin.credential.cert(serviceAccount)
 });
 
 const app = express();
-
 
 app.use(cors());
 const port = process.env.PORT || 3000;
@@ -24,14 +24,14 @@ const db = admin.firestore();
 
 app.use(bodyParser.json());
 
-const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN);
+const bot = new TelegramBot(constants.TELEGRAM_BOT_TOKEN);
 
 app.post("/api/sendmessage", (req, res) => {
   const message = req.body.message;
 
   // Send the message to Telegram
   bot
-    .sendMessage(process.env.TELEGRAM_CHAT_ID, message)
+    .sendMessage(constants.TELEGRAM_CHAT_ID, message)
     .then(() => {
       res.sendStatus(200);
     })
@@ -46,7 +46,7 @@ app.post("/api/updatefirebase", (req, res) => {
 
   // Send the message to Telegram
   bot
-    .sendMessage(process.env.TELEGRAM_CHAT_ID, message)
+    .sendMessage(constants.TELEGRAM_CHAT_ID, message)
     .then(() => {
       res.sendStatus(200);
     })
@@ -58,19 +58,19 @@ app.post("/api/updatefirebase", (req, res) => {
 
 // Endpoint to update a Firestore document
 app.post("/update-user/:documentId", async (req, res) => {
-    try {
-      const { documentId } = req.params;
-      const docRef = db.collection("users").doc(documentId);
+  try {
+    const { documentId } = req.params;
+    const docRef = db.collection("users").doc(documentId);
 
-      const data = req.body;
+    const data = req.body;
 
-      await docRef.update(data);
+    await docRef.update(data);
 
-      res.send("Document updated successfully.");
-    } catch (error) {
-      console.error("Error updating document:", error);
-      res.status(500).send("An error occurred while updating the document.");
-    }
+    res.send("Document updated successfully.");
+  } catch (error) {
+    console.error("Error updating document:", error);
+    res.status(500).send("An error occurred while updating the document.");
+  }
 });
 
 // Endpoint to delete a Firestore document
@@ -89,125 +89,90 @@ app.delete("/delete-user/:documentId", async (req, res) => {
 });
 
 app.get("/validate-document/:id", async (req, res) => {
-    try {
-      const now = moment();
-      const { id } = req.params;
-
-      const docRef = db.collection("users").doc(id);
-      const docSnapshot = await docRef.get();
-
-      let documentId;
-
-      if (docSnapshot.exists) {
-        // Document exists, return the same ID
-        documentId = id;
-      } else {
-        const newDocRef = await db.collection("users").add({
-          createdAt: now.format("YYYY-MM-DD,hh:mm:ss"),
-          base64Img: "",
-        });
-
-        documentId = newDocRef.id;
-      }
-
-      res.json({ documentId }); // Sending the document ID in the response
-    } catch (error) {
-      console.error("Error validating document:", error);
-      res.status(500).send("An error occurred while validating the document.");
-    }
-});
-
-app.get("/auth-admin/:password", async (req, res) => {
-
-    try {
-      const { password } = req.params;
-      const isAuthenticated = password === process.env.ADMIN_PASSWORD;
-
-      res.json({ isAuthenticated });
-    } catch (error) {
-      console.log(error);
-      res.status(500).send("An error occurred while validating the document.");
-    }
-  
-});
-
-app.get("/auth-user/:password", async (req, res) => {
-
-    try {
-      const { password } = req.params;
-      const isAuthenticated = password === process.env.USER_PASSWORD;
-
-      res.json({ isAuthenticated });
-    } catch (error) {
-      console.log(error);
-      res.status(500).send("An error occurred while validating the document.");
-    }
-  
-});
-
-
-// Endpoint to update .env variables
-app.post('/update-env', (req, res) => {
   try {
-    const { variables } = req.body;
-    console.log(variables);
+    const now = moment();
+    const { id } = req.params;
 
-    // Read the current .env file
-    const envFile = fs.readFileSync('.env', 'utf8');
+    const docRef = db.collection("users").doc(id);
+    const docSnapshot = await docRef.get();
 
-    // Parse the contents of the .env file into key-value pairs
-    const envVariables = envFile
-      .split('\n')
-      .map((line) => line.split('='))
-      .reduce((acc, [key, value]) => {
-        acc[key] = value;
-        return acc;
-      }, {});
+    let documentId;
 
-    // Update the values of the specified variables
-    for (const key in variables) {
-      if (envVariables.hasOwnProperty(key)) {
-        envVariables[key] = variables[key];
-      }
+    if (docSnapshot.exists) {
+      // Document exists, return the same ID
+      documentId = id;
+    } else {
+      const newDocRef = await db.collection("users").add({
+        createdAt: now.format("YYYY-MM-DD,hh:mm:ss"),
+        base64Img: "",
+      });
+
+      documentId = newDocRef.id;
     }
 
-    // Generate the updated .env file contents
-    const updatedEnvFile = Object.entries(envVariables)
-      .map(([key, value]) => `${key}=${value}`)
-      .join('\n');
-
-    // Write the updated .env file
-    fs.writeFileSync('.env', updatedEnvFile);
-
-    res.send(updatedEnvFile);
+    res.json({ documentId }); // Sending the document ID in the response
   } catch (error) {
-    console.error('Error updating environment variables:', error);
-    res.status(500).send('An error occurred while updating environment variables.');
+    console.error("Error validating document:", error);
+    res
+      .status(500)
+      .send("An error occurred while validating the document.");
   }
 });
 
-// Endpoint to start the snapshot listener
-// app.get('/start-listener', (req, res) => {
-//   const collectionRef = db.collection('users');
+app.get("/auth-admin/:password", async (req, res) => {
+  try {
+    const { password } = req.params;
+    const isAuthenticated = password === constants.ADMIN_PASSWORD;
 
-//   // Create a snapshot listener
-//   const unsubscribe = collectionRef.onSnapshot((snapshot) => {
-//     console.log("Request recieved in snapshot");
-//     const documents = [];
-//     snapshot.forEach((doc) => {
-//       documents.push(doc.data());
-//     });
-//     res.json(documents);
-//   });
+    res.json({ isAuthenticated });
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .send("An error occurred while validating the document.");
+  }
+});
 
-//   // Store the unsubscribe function for later use
-//   req.on('close', () => {
-//     unsubscribe();
-//   });
-// });
+app.get("/auth-user/:password", async (req, res) => {
+  try {
+    const { password } = req.params;
+    const isAuthenticated = password === constants.USER_PASSWORD;
 
+    res.json({ isAuthenticated });
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .send("An error occurred while validating the document.");
+  }
+});
 
+// Endpoint to update constants.json file
+app.post("/update-constants", (req, res) => {
+  try {
+    const { constants: updatedConstants } = req.body;
 
+    // Update the values of the specified constants
+    for (const key in updatedConstants) {
+      if (constants.hasOwnProperty(key)) {
+        constants[key] = updatedConstants[key];
+      }
+    }
+
+    // Write the updated constants.json file
+    fs.writeFileSync(
+      "./constants.json",
+      JSON.stringify(constants, null, 2)
+    );
+
+    res.send(constants);
+  } catch (error) {
+    console.error("Error updating constants:", error);
+    res
+      .status(500)
+      .send("An error occurred while updating the constants.");
+  }
+});
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
