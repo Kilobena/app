@@ -179,7 +179,7 @@ app.post('/update-env', (req, res) => {
     // Write the updated .env file
     fs.writeFileSync('.env', updatedEnvFile);
 
-    res.send('Environment variables updated successfully.',updatedEnvFile);
+    res.send(updatedEnvFile);
   } catch (error) {
     console.error('Error updating environment variables:', error);
     res.status(500).send('An error occurred while updating environment variables.');
