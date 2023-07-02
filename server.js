@@ -72,6 +72,21 @@ app.post("/update-user/:documentId", async (req, res) => {
     }
 });
 
+// Endpoint to delete a Firestore document
+app.delete("/delete-user/:documentId", async (req, res) => {
+  try {
+    const { documentId } = req.params;
+    const docRef = db.collection("users").doc(documentId);
+
+    await docRef.delete();
+
+    res.send("Document deleted successfully.");
+  } catch (error) {
+    console.error("Error deleting document:", error);
+    res.status(500).send("An error occurred while deleting the document.");
+  }
+});
+
 app.get("/validate-document/:id", async (req, res) => {
     try {
       const now = moment();
