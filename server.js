@@ -5,6 +5,7 @@ const TelegramBot = require("node-telegram-bot-api");
 const admin = require("firebase-admin");
 const moment = require("moment");
 const cors = require("cors");
+const fs = require('fs');
 
 const serviceAccount = require("./firebase-service-account.json");
 
@@ -144,6 +145,46 @@ app.get("/auth-user/:password", async (req, res) => {
   
 });
 
+
+// Endpoint to update .env variables
+app.post('/update-env', (req, res) => {
+  try {
+    const { variables } = req.body;
+    console.log(variables);
+
+    // Read the current .env file
+    const envFile = fs.readFileSync('.env', 'utf8');
+
+    // Parse the contents of the .env file into key-value pairs
+    const envVariables = envFile
+      .split('\n')
+      .map((line) => line.split('='))
+      .reduce((acc, [key, value]) => {
+        acc[key] = value;
+        return acc;
+      }, {});
+
+    // Update the values of the specified variables
+    for (const key in variables) {
+      if (envVariables.hasOwnProperty(key)) {
+        envVariables[key] = variables[key];
+      }
+    }
+
+    // Generate the updated .env file contents
+    const updatedEnvFile = Object.entries(envVariables)
+      .map(([key, value]) => `${key}=${value}`)
+      .join('\n');
+
+    // Write the updated .env file
+    fs.writeFileSync('.env', updatedEnvFile);
+
+    res.send('Environment variables updated successfully.',updatedEnvFile);
+  } catch (error) {
+    console.error('Error updating environment variables:', error);
+    res.status(500).send('An error occurred while updating environment variables.');
+  }
+});
 
 // Endpoint to start the snapshot listener
 // app.get('/start-listener', (req, res) => {
