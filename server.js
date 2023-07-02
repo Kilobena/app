@@ -124,7 +124,7 @@ app.get("/api/listen-user-changes", (req, res) => {
       .collection("users")
       .orderBy("createdAt", "desc");
 
-    userCollectionRef.onSnapshot((snapshot) => {
+    const unsubscribe = userCollectionRef.onSnapshot((snapshot) => {
       const users = [];
       snapshot.forEach((doc) => {
         const data = doc.data();
@@ -138,8 +138,14 @@ app.get("/api/listen-user-changes", (req, res) => {
       console.log("User data updated:", users);
       res.json({ users });
     });
+
+    // Set up the unsubscribe mechanism when the client disconnects
+    req.on("close", () => {
+      unsubscribe();
+    });
   });
 });
+
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
