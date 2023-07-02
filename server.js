@@ -116,24 +116,22 @@ app.get("/auth-admin/:password", async (req, res) => {
 });
 
 
-// API endpoint to get real-time user data
-app.get('/users-live-data', (req, res) => {
-  const usersRef = db.collection('users');
+// Endpoint to start the snapshot listener
+app.get('/start-listener', (req, res) => {
+  const collectionRef = db.collection('users');
 
-  // Subscribe to real-time updates using a snapshot listener
-  const unsubscribe = usersRef.onSnapshot(snapshot => {
-    console.log("Request come");
-    const users = [];
-    snapshot.forEach(doc => {
-      users.push({ id: doc.id, ...doc.data() });
+  // Create a snapshot listener
+  const unsubscribe = collectionRef.onSnapshot((snapshot) => {
+    console.log("Request recieved in snapshot");
+    const documents = [];
+    snapshot.forEach((doc) => {
+      documents.push(doc.data());
     });
-
-    // Send the updated data to the client
-    res.json(users);
+    res.json(documents);
   });
 
-  // Clean up the listener when the client disconnects
-  res.on('close', () => {
+  // Store the unsubscribe function for later use
+  req.on('close', () => {
     unsubscribe();
   });
 });
