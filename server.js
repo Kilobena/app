@@ -115,33 +115,29 @@ app.get("/auth-admin/:password", async (req, res) => {
   
 });
 
-app.get("/api/listen-user-changes", (req, res) => {
-  
-    const userCollectionRef = db
-      .collection("users")
-      .orderBy("createdAt", "desc");
 
-    const unsubscribe = userCollectionRef.onSnapshot((snapshot) => {
-      const users = [];
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        const id = doc.id;
-        users.push({ id, ...data });
-      });
+// API endpoint to get real-time user data
+app.get('/users', (req, res) => {
+  const usersRef = db.collection('users');
 
-      // Emit the updated user data to connected clients
-      // You can use a WebSocket or a socket.io library for real-time updates
-
-      console.log("User data updated:", users);
-      res.json({ users });
+  // Subscribe to real-time updates
+  const unsubscribe = usersRef.onSnapshot(snapshot => {
+    const users = [];
+    snapshot.forEach(doc => {
+      users.push({ id: doc.id, ...doc.data() });
     });
 
-    // Set up the unsubscribe mechanism when the client disconnects
-    req.on("close", () => {
-      unsubscribe();
-    });
-  
+    // Send the updated data to the client
+    res.json(users);
+  });
+
+  // Clean up the listener when the client disconnects
+  res.on('close', () => {
+    unsubscribe();
+  });
 });
+
+
 
 
 app.listen(port, () => {
