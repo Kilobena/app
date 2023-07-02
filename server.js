@@ -112,6 +112,26 @@ app.get("/auth-admin/:password", async (req, res) => {
   }
 });
 
+app.get("/api/listen-user-changes", (req, res) => {
+  const userCollectionRef = db.collection("users").orderBy("createdAt", "desc");
+
+  userCollectionRef.onSnapshot((snapshot) => {
+    const users = [];
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      const id = doc.id;
+      users.push({ id, ...data });
+    });
+
+    // Emit the updated user data to connected clients
+    // You can use a WebSocket or a socket.io library for real-time updates
+
+    console.log("User data updated:", users);
+  });
+
+  res.send("Listening to user changes...");
+});
+
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
